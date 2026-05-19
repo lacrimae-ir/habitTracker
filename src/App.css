@@ -1,0 +1,1017 @@
+/* -------------------------------------------------------------------------- */
+/* Retro Pixel Habit Tracker Layout & Components                              */
+/* -------------------------------------------------------------------------- */
+
+/* Window Container representing the Desktop App Frame */
+.desktop-window {
+  width: 100%;
+  max-width: 550px;
+  background-color: var(--bg-window);
+  border: 4px solid var(--color-white);
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 0 0 rgba(140, 111, 102, 0.15),
+    0 20px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+  animation: windowPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes windowPop {
+  0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Header/Top Bar of the Desktop Window */
+.window-header {
+  height: 64px;
+  background-color: var(--bg-header);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 4px solid var(--color-white);
+  position: relative;
+  /* Makes the header draggable in frameless Electron window */
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.window-title-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Inherit drag from parent header */
+  -webkit-app-region: drag;
+}
+
+.window-logo {
+  width: 24px;
+  height: 24px;
+  animation: spinSlow 6s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.window-title {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Override drag region so buttons inside are clickable */
+  -webkit-app-region: no-drag;
+}
+
+/* Cute Sound Effect Toggle Button */
+.sfx-toggle {
+  background-color: var(--color-white);
+  border: 2px solid var(--bg-item);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+  font-size: 14px;
+}
+
+.sfx-toggle:hover {
+  transform: scale(1.05);
+  border-color: var(--color-text-main);
+  box-shadow: 0 2px 0 0 var(--bg-item);
+}
+
+.sfx-toggle:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* Close/Exit button using asset xbutton.png */
+.exit-button {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.exit-button img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.exit-button:hover {
+  transform: scale(1.1);
+}
+
+.exit-button:active {
+  transform: translateY(2px);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Navigation Tabs                                                            */
+/* -------------------------------------------------------------------------- */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0 16px;
+}
+
+.tab-btn {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  background-color: var(--bg-tab);
+  color: var(--color-text-main);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 0 0 rgba(140, 111, 102, 0.1);
+  text-transform: capitalize;
+}
+
+.tab-btn:hover {
+  background-color: var(--bg-tab-active);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 rgba(140, 111, 102, 0.15);
+}
+
+.tab-btn.active {
+  background-color: var(--bg-tab-active);
+  color: var(--color-text-dark);
+  font-weight: bold;
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--color-white);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Main Habit Tracker View                                                    */
+/* -------------------------------------------------------------------------- */
+.window-content {
+  padding: 0 24px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input Form section */
+.add-habit-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.input-wrapper {
+  flex: 1;
+  background-color: var(--color-white);
+  border-radius: 999px;
+  padding: 2px;
+  box-shadow: inset 0 2px 6px rgba(140, 111, 102, 0.08);
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--bg-tab-active);
+}
+
+.habit-input {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 12px;
+  border-radius: 999px;
+  color: var(--color-text-dark);
+  background: transparent;
+}
+
+.habit-input::placeholder {
+  color: var(--color-gray);
+  font-size: 11px;
+}
+
+/* Plus button using plushabit.png */
+.add-button {
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.add-button img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.add-button:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.add-button:active {
+  transform: translateY(2px);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Habits List Area                                                           */
+/* -------------------------------------------------------------------------- */
+.habits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 380px;
+  padding-right: 4px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  border: 2px dashed var(--bg-item);
+  animation: fadeIn 0.4s ease;
+}
+
+.empty-state-img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 16px;
+  opacity: 0.65;
+  animation: floaty 3s ease-in-out infinite;
+}
+
+@keyframes floaty {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+.empty-state-text {
+  font-size: 11px;
+  color: var(--color-text-main);
+  line-height: 1.6;
+}
+
+/* Individual Habit Row Item */
+.habit-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-item);
+  border-radius: 999px;
+  padding: 10px 14px 10px 22px;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+  box-shadow: 0 4px 0 0 rgba(110, 82, 73, 0.1);
+  border: 2px solid transparent;
+}
+
+.habit-item.dropdown-active {
+  z-index: 200;
+}
+
+.habit-item:hover {
+  background-color: var(--bg-item-active);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 rgba(110, 82, 73, 0.15);
+}
+
+.habit-item.completed {
+  opacity: 0.85;
+  background-color: #cbb2ab;
+  text-decoration: none;
+}
+
+/* Habit Left Section: Name & Streak */
+.habit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  overflow: hidden;
+  margin-right: 12px;
+}
+
+.habit-name {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--color-white);
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.habit-item.completed .habit-name {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.habit-streak {
+  font-family: var(--font-numeric);
+  font-size: 14px;
+  color: #ffece8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Habit Right Section: Controls */
+.habit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+/* Custom Dropdown Styling (Daily/Weekly) */
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-trigger {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: bold;
+  background-color: var(--bg-tab);
+  color: var(--color-text-main);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.dropdown-trigger:hover {
+  background-color: var(--color-white);
+  border-color: var(--bg-tab);
+}
+
+.dropdown-trigger span {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.dropdown-trigger.open span {
+  transform: rotate(180deg);
+}
+
+/* Custom overlay select menu matching screenshot */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background-color: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(110, 82, 73, 0.15);
+  border: 2px solid var(--bg-tab);
+  z-index: 100;
+  width: 90px;
+  overflow: hidden;
+  animation: dropdownSlide 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+@keyframes dropdownSlide {
+  0% { transform: translateY(-5px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.dropdown-item {
+  width: 100%;
+  background: transparent;
+  padding: 8px 0;
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--color-text-main);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-transform: uppercase;
+}
+
+.dropdown-item:first-child {
+  border-bottom: 2px solid var(--bg-tab);
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-window);
+  color: var(--color-text-dark);
+  font-weight: bold;
+}
+
+.dropdown-item.selected {
+  background-color: var(--bg-tab-active);
+  color: var(--color-text-dark);
+  font-weight: bold;
+}
+
+/* Checkbox Button */
+.checkbox-button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--color-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+  color: transparent;
+}
+
+.checkbox-button:hover {
+  transform: scale(1.15);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.checkbox-button.checked {
+  background-color: var(--color-white);
+  color: var(--bg-item);
+}
+
+.checkbox-button.checked svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--bg-item);
+  stroke-width: 3px;
+  fill: none;
+}
+
+/* Delete Button - always red */
+.delete-habit-btn {
+  background: transparent;
+  color: #ff4444;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0;
+  opacity: 0.55;
+  transition: all 0.15s ease;
+  margin-left: 2px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+}
+
+.habit-item:hover .delete-habit-btn {
+  opacity: 1;
+}
+
+.delete-habit-btn:hover {
+  color: #cc0000;
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 4px rgba(255,50,50,0.5));
+}
+
+/* -------------------------------------------------------------------------- */
+/* Analysis Dashboard Tab                                                     */
+/* -------------------------------------------------------------------------- */
+.analysis-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Row of Stats Cards */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.stat-card {
+  background-color: var(--color-white);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 0 0 rgba(140, 111, 102, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px solid var(--bg-tab);
+}
+
+.stat-label {
+  font-size: 8px;
+  color: var(--color-text-main);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.stat-value {
+  font-family: var(--font-numeric);
+  font-size: 32px;
+  color: var(--color-text-dark);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 8px;
+  color: var(--color-gray);
+  margin-top: 4px;
+}
+
+/* Cute Hearts visual streak display */
+.hearts-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.heart-icon {
+  width: 14px;
+  height: 14px;
+  fill: var(--color-accent);
+  animation: beat 1.5s infinite ease-in-out;
+}
+
+.heart-icon.empty {
+  fill: var(--bg-tab);
+  animation: none;
+}
+
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* Custom Progress Bar Section */
+.completion-card {
+  background-color: var(--color-white);
+  border-radius: 14px;
+  padding: 16px;
+  border: 2px solid var(--bg-tab);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-title {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--color-text-main);
+  margin: 0;
+}
+
+.progress-percent {
+  font-family: var(--font-numeric);
+  font-size: 18px;
+  color: var(--color-text-dark);
+  font-weight: bold;
+}
+
+/* Customized Pixel Progress Bar */
+.pixel-progress-container {
+  height: 24px;
+  background-color: var(--bg-window);
+  border: 2px solid var(--bg-item);
+  border-radius: 6px;
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-progress-fill {
+  height: 100%;
+  background-color: var(--color-accent);
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Diagonal stripes on completion fill */
+.pixel-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: linear-gradient(
+    -45deg, 
+    rgba(255, 255, 255, 0.2) 25%, 
+    transparent 25%, 
+    transparent 50%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.2) 75%, 
+    transparent 75%, 
+    transparent
+  );
+  background-size: 16px 16px;
+  animation: stripeMove 1.5s linear infinite;
+}
+
+@keyframes stripeMove {
+  from { background-position: 0 0; }
+  to { background-position: 16px 0; }
+}
+
+/* 7-Day Completion Tracker Grid */
+.tracker-card {
+  background-color: var(--color-white);
+  border-radius: 14px;
+  padding: 16px;
+  border: 2px solid var(--bg-tab);
+}
+
+.tracker-title {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--color-text-main);
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.grid-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.grid-day-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.grid-day-label {
+  font-size: 8px;
+  color: var(--color-gray);
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.grid-day-box {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: var(--bg-window);
+  border: 2px solid var(--bg-tab);
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.grid-day-box.filled {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: inset 0 -2px 0 0 rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}
+
+.grid-day-box.partial {
+  background-color: var(--bg-tab-active);
+  border-color: var(--bg-tab-active);
+}
+
+.grid-day-box:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-text-dark);
+  color: var(--color-white);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Modals & Dialogs                                                           */
+/* -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(110, 82, 73, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: var(--color-white);
+  border: 4px solid var(--bg-item);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 320px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-title {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+  margin: 0 0 12px;
+}
+
+.modal-desc {
+  font-size: 10px;
+  color: var(--color-text-main);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modal-btn.primary {
+  background-color: var(--color-accent);
+  color: var(--color-white);
+}
+
+.modal-btn.primary:hover {
+  background-color: #ff6b5c;
+  transform: translateY(-2px);
+}
+
+.modal-btn.secondary {
+  background-color: var(--bg-window);
+  color: var(--color-text-main);
+}
+
+.modal-btn.secondary:hover {
+  background-color: var(--bg-tab);
+  transform: translateY(-2px);
+}
+
+/* Exit/Goodbye Splash Screen Overlay */
+.goodbye-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--bg-window);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  animation: slideDown 0.4s ease-out;
+  padding: 40px;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+.goodbye-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+  margin-bottom: 8px;
+  animation: floaty 2s ease-in-out infinite;
+}
+
+.goodbye-subtitle {
+  font-size: 10px;
+  color: var(--color-text-main);
+  margin-bottom: 24px;
+}
+
+.reboot-btn {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background-color: var(--color-white);
+  border: 2px solid var(--bg-item);
+  color: var(--color-text-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 0 0 var(--bg-item);
+}
+
+.reboot-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 var(--bg-item);
+  background-color: var(--bg-header);
+}
+
+.reboot-btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Pixel Art Delete Confirmation Popup                                        */
+/* -------------------------------------------------------------------------- */
+
+/* Soft overlay for delete popup */
+.delete-overlay {
+  background-color: rgba(216, 190, 183, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+/* Main popup card — pixel style using theme colors */
+.delete-modal-content {
+  background-color: var(--bg-window);
+  border: 4px solid var(--bg-item);
+  border-radius: 0px;
+  box-shadow:
+    4px 4px 0 0 var(--bg-item),
+    8px 8px 0 0 rgba(216, 190, 183, 0.3);
+  position: relative;
+  padding: 28px 24px 20px;
+  image-rendering: pixelated;
+}
+
+/* Pixel corner accent squares */
+.pixel-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--bg-item);
+}
+.pixel-corner.tl { top: -4px; left: -4px; }
+.pixel-corner.tr { top: -4px; right: -4px; }
+.pixel-corner.bl { bottom: -4px; left: -4px; }
+.pixel-corner.br { bottom: -4px; right: -4px; }
+
+/* Popup title */
+.delete-modal-title {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  color: var(--color-text-dark);
+  margin: 0 0 8px;
+  text-shadow: 2px 2px 0 rgba(216, 190, 183, 0.4);
+  letter-spacing: 1px;
+}
+
+/* Target name display */
+.delete-modal-name {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--color-text-dark);
+  margin: 0 0 8px;
+  background-color: var(--bg-header);
+  border: 2px solid var(--bg-item);
+  border-radius: 0;
+  padding: 6px 12px;
+  word-break: break-all;
+}
+
+/* Subtext warning */
+.delete-modal-desc {
+  font-size: 9px;
+  color: var(--color-text-main);
+  margin: 0 0 16px;
+}
+
+/* Confirm button — red pixel style */
+.delete-confirm-btn {
+  background-color: #e02040;
+  color: var(--color-white);
+  border: 3px solid #8b1a2e;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 0 #8b1a2e;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.delete-confirm-btn:hover {
+  background-color: #b51a30;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 0 #8b1a2e;
+}
+
+.delete-confirm-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* Cancel button — theme pastel pixel style */
+.delete-cancel-btn {
+  background-color: var(--bg-tab);
+  color: var(--color-text-dark);
+  border: 3px solid var(--bg-item);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 0 var(--bg-item);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.delete-cancel-btn:hover {
+  background-color: var(--bg-tab-active);
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 0 var(--bg-item);
+}
+
+.delete-cancel-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
